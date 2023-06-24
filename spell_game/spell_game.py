@@ -263,18 +263,11 @@ def fn_fight():
             screen.blit(my_text_list[i].img,(50,(120+(120*i))))
             my_text_list[i].screen(screen, 180,(140+(120*i)))
         
-        #행동 글자 
-        #screen.blit(spell_text,(50,120))  
-     #   screen.blit(spell_text,(50,240))
-      #  screen.blit(spell_text,(50,360))
-     #   screen.blit(spell_text,(50,480))
-       # screen.blit(spell_text,(50,600))
-        
         pygame.display.update()
     
     pygame.quit()
-        
-fn_fight()
+if __name__ == "__main__":       
+    fn_fight()
 
 
 
