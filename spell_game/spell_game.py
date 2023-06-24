@@ -16,10 +16,11 @@ import pygame
 import random
 
 class chess_text:
-    def __init__(self,img):
+    def __init__(self,img,name):
         self.img = pygame.image.load(img)
+        self.name = name
        # self.sound = pygame.mixer.Sound(mp3)
-        self.word_list = ["aaa","www","sss"] 
+        self.word_list = ["aaa","www","sss","dfsf"] 
         self.word = random.choice(self.word_list)
         
         self.RED = (255,0,0)
@@ -27,19 +28,22 @@ class chess_text:
         self.WHITE = (255,255,255)
         self.BLACK = (0,0,0)
         
-        self.font = pygame.font.SysFont(None,130)
+        self.font = pygame.font.SysFont(None,100)
         
     def re_word(self):
         self.word = random.choice(self.word_list)
        
     
-    def move(self):
-        pass
-        return
-    
+    def move(self,position):
+        if self.name == "pon": 
+            position += 8
+            return tiles_init(position),position
+        if self.name == "bishop": 
+            position += 9
+            return tiles_init(position),position
     def screen(self,screen,x,y):
         screen.blit(self.font.render(str(self.word),True,self.BLACK),(x,y))
-    
+
         
 def tiles_init(position):
     tiles = ["0","1","0","1","0","1","0","1",
@@ -50,6 +54,7 @@ def tiles_init(position):
              "1","0","1","0","1","0","1","0",
              "0","1","0","1","0","1","0","1",
              "1","0","1","0","1","0","1","0"] 
+    
     tiles[position] = "player"
     return tiles
 
@@ -74,10 +79,11 @@ def fn_fight():
     
     spell_ba = pygame.image.load("글자바.png")
     
-    pon_text = chess_text("폰_text.png")
+    pon_text = chess_text("폰_text.png","pon")
+    bishop = chess_text("비숍_text.png","bishop")
     
-    text_list = [pon_text]
-    my_text_list = [pon_text]
+    text_list = [pon_text,bishop]
+    my_text_list = [pon_text,bishop]
     
     
     spell_text = pygame.image.load("글자텍스트.png")
@@ -195,43 +201,22 @@ def fn_fight():
                         word += spell[i]
                     spell.clear() 
                   #  print(word)
-                    
-                    if word == "/" + "go" :
-                        position += 8
-                        tiles = tiles_init(position)
-                       
-                        
-                        
-                        
-                    elif word == "/" + "back" :
-                        print("뒤로")
-
-                    elif word == "/" + "to" :
-                        print("가다")
-               
-                    else :
-                        print("그런 단어는 없어")
-                    
+                  
+                    for i in range(len(my_text_list)):
+                        if word == "/" + my_text_list[i].word :
+                            tiles,position = my_text_list[i].move(position)
+                            my_text_list[i].re_word()
                     word = "/"
+        
         
         if len(spell) > 8 :
             for i in range(len(spell)):
                 word += spell[i]
             spell.clear() 
-          
             
-            if word == "/" + "go" :
-                print("가다")
-                
-            elif word == "/" + "back" :
-                print("뒤로")
-
-            elif word == "/" + "to" :
-                print("가다")
-        
-            
-            else :
-                print("그런 단어는 없어")
+            for i in range(len(my_text_list)):
+                if word == "/" + my_text_list[i].word :
+                    tiles,position = my_text_list[i].move(position)
             
             word = "/"
             
@@ -276,7 +261,7 @@ def fn_fight():
         # 스킬 / 영단어 나오는 부분
         for i in range(len(my_text_list)):
             screen.blit(my_text_list[i].img,(50,(120+(120*i))))
-            my_text_list[i].screen(screen, 150,(120+(120*i)))
+            my_text_list[i].screen(screen, 180,(140+(120*i)))
         
         #행동 글자 
         #screen.blit(spell_text,(50,120))  
