@@ -102,8 +102,8 @@ def fn_fight():
     tile_black_shades = pygame.image.load("검은타일그림자.png")
     nagagi = pygame.image.load("나가기.png")
     
-    player = cls_character("폰.png","player",4)
-    enemy = cls_character("블랙폰.png","enemy",59)
+    player = cls_character("폰.png","player",3)
+    enemy = cls_character("블랙폰.png","enemy",60)
     
     spell_ba = pygame.image.load("글자바.png")
     
@@ -111,7 +111,13 @@ def fn_fight():
     bishop = chess_text("비숍_text.png","bishop")
     
     text_list = [pon_text,bishop]
-    my_text_list = [pon_text,bishop]
+    text_1 =pon_text
+    text_2 =bishop
+    text_3 =pon_text
+    text_3.re_word()
+    # 새로운 객체로 만들어야 
+    
+    my_text_list = [text_1,text_2,text_3]
     
     
     spell_text = pygame.image.load("글자텍스트.png")
