@@ -15,12 +15,30 @@ Created on Sun Jun 11 19:40:37 2023
 import pygame
 import random
 
+class cls_character:
+    def __init__(self,img,name,position):
+        self.img = pygame.image.load(img)
+        self.name = name
+        self.position = position
+        
+        self.RED = (255,0,0)
+        self.BLUE = (0, 0, 255)
+        self.WHITE = (255,255,255)
+        self.BLACK = (0,0,0)
+        
+        self.font = pygame.font.SysFont(None,30)
+ #       self.hp_img = self.font.render(str(self.hp),True,self.BLACK)
+        self.name_img = self.font.render(str(self.name),True,self.BLACK)
+
 class chess_text:
     def __init__(self,img,name):
         self.img = pygame.image.load(img)
         self.name = name
        # self.sound = pygame.mixer.Sound(mp3)
-        self.word_list = ["aaa","www","sss","dfsf"] 
+        self.word_list = ["about","across",
+                          " actor" ,"afternoon" 
+                          ,"again" ,"age" ,"ago" ,"air" ,"airplane" ,"airport" 
+                          ,"album" ,"always" ,"among" ,"an" ,"angry" ,"animal" ,"answer","apple","arrive"] 
         self.word = random.choice(self.word_list)
         
         self.RED = (255,0,0)
@@ -34,18 +52,25 @@ class chess_text:
         self.word = random.choice(self.word_list)
        
     
-    def move(self,position):
+    def move(self,tiles,player,enemy):
+        
         if self.name == "pon": 
-            position += 8
-            return tiles_init(position),position
+            player.position += 8
+            if player.position >= len(tiles):
+                player.position -= 8
+            return re_tiles(player,enemy),player.position,enemy.position
+        
         if self.name == "bishop": 
-            position += 9
-            return tiles_init(position),position
+            player.position += 9
+            if player.position >= len(tiles):
+                 player.position -= 9
+            return re_tiles(player,enemy),player.position,enemy.position
+        
     def screen(self,screen,x,y):
         screen.blit(self.font.render(str(self.word),True,self.BLACK),(x,y))
 
         
-def tiles_init(position):
+def re_tiles(player,enemy):
     tiles = ["0","1","0","1","0","1","0","1",
              "1","0","1","0","1","0","1","0",
              "0","1","0","1","0","1","0","1",
@@ -55,7 +80,9 @@ def tiles_init(position):
              "0","1","0","1","0","1","0","1",
              "1","0","1","0","1","0","1","0"] 
     
-    tiles[position] = "player"
+    tiles[player.position] = player.name
+    tiles[enemy.position] = enemy.name
+    
     return tiles
 
 def fn_fight():
@@ -73,9 +100,10 @@ def fn_fight():
     tile_black = pygame.image.load("검은타일.png")
     tile_blue_shades = pygame.image.load("파란타일그림자.png")
     tile_black_shades = pygame.image.load("검은타일그림자.png")
+    nagagi = pygame.image.load("나가기.png")
     
-    player = pygame.image.load("폰.png")
-    position = 4
+    player = cls_character("폰.png","player",4)
+    enemy = cls_character("블랙폰.png","enemy",59)
     
     spell_ba = pygame.image.load("글자바.png")
     
@@ -98,7 +126,10 @@ def fn_fight():
              "1","0","1","0","1","0","1","0",
              "0","1","0","1","0","1","0","1",
              "1","0","1","0","1","0","1","0"]
-    tiles[position] = "player"
+    
+    tiles[player.position] = player.name
+    tiles[enemy.position] = enemy.name
+ 
     tiles_shades = [tile_blue_shades,tile_black_shades,tile_blue_shades,tile_black_shades,tile_blue_shades,tile_black_shades,tile_blue_shades,tile_black_shades]
     
     
@@ -128,7 +159,7 @@ def fn_fight():
                 if event.button == 1:  # 마우스 왼쪽 클릭시
                     x_p, y_p = pygame.mouse.get_pos()    
                 
-                    if x_p > 1200 and x_p < 1800 and y_p > 10 and y_p < 400:
+                    if x_p > 1600 and x_p < 1800 and y_p > 50 and y_p < 400:
                         running = False
                     
             if event.type == pygame.MOUSEBUTTONUP:
@@ -193,30 +224,32 @@ def fn_fight():
                 if event.key == pygame.K_m:
                     spell.append("m")
                 
-               # print(spell)
+                if event.key == pygame.K_RETURN:
                 
-                if event.key == pygame.K_SPACE:
-                # 캐릭터 움직임     
+                    # 캐릭터 움직임     
                     for i in range(len(spell)):
                         word += spell[i]
                     spell.clear() 
-                  #  print(word)
                   
                     for i in range(len(my_text_list)):
                         if word == "/" + my_text_list[i].word :
-                            tiles,position = my_text_list[i].move(position)
+                            tiles,player.position,enemy.position = my_text_list[i].move(tiles,player,enemy)
                             my_text_list[i].re_word()
                     word = "/"
-        
-        
+                
+                if event.key == pygame.K_BACKSPACE:
+                    if len(spell) >= 1:
+                        del(spell[len(spell)-1])
+                    
+        # 글자가 제한을 넘었을때    
         if len(spell) > 8 :
             for i in range(len(spell)):
                 word += spell[i]
             spell.clear() 
             
-            for i in range(len(my_text_list)):
-                if word == "/" + my_text_list[i].word :
-                    tiles,position = my_text_list[i].move(position)
+          #  for i in range(len(my_text_list)):
+           #     if word == "/" + my_text_list[i].word :
+            #        tiles,player.position = my_text_list[i].move(player.position)
             
             word = "/"
             
@@ -237,7 +270,11 @@ def fn_fight():
                     screen.blit(tile_black,(tile_x,tile_y))
                 
                 if tiles[i] == "player":
-                    screen.blit(player,(tile_x,tile_y))
+                    screen.blit(player.img,(tile_x,tile_y))
+                
+                if tiles[i] == "enemy":
+                    screen.blit(enemy.img,(tile_x,tile_y))
+                 
                 
             if i == len(tiles)-1:
                 floor = 8
@@ -262,7 +299,7 @@ def fn_fight():
         for i in range(len(my_text_list)):
             screen.blit(my_text_list[i].img,(50,(120+(120*i))))
             my_text_list[i].screen(screen, 180,(140+(120*i)))
-        
+        screen.blit(nagagi,(1600,50))
         pygame.display.update()
     
     pygame.quit()
